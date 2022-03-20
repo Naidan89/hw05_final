@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if is_edit %}
+Сохранить запись
+{% else %}
+Добавить запись
+{% endif %}  
+{% endblock %}
+
+{% block content %}
+{% load user_filters %}
+  <div class="row justify-content-center">
+    <div class="col-md-8 p-5">
+      <div class="card">
+        <div class="card-header">
+            {% if is_edit %}
+              Сохранить запись
+            {% else %}
+              Добавить запись
+            {% endif %}
+        </div>
+        <div class="card-body">
+          {% if is_edit %}
+            {% include 'includes/uni_form.html' with button='Сохранить' %}
+          {% else %}
+            {% include 'includes/uni_form.html' with button='Добавить' %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
