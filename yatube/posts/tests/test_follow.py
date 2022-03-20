@@ -18,7 +18,6 @@ class FollowModelTest(TestCase):
         Follow.objects.create(user=cls.user, author=cls.user2)
 
     def setUp(self):
-        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -32,12 +31,17 @@ class FollowModelTest(TestCase):
         authors2 = Follow.objects.filter(user=self.user)
         cnt2 = len(authors2)
         self.assertEqual(cnt2, cnt + 1)
+
+    def test_unfollow(self):
+        """Проверка отписки"""
+        authors = Follow.objects.filter(user=self.user)
+        cnt = len(authors)
         self.authorized_client.get(reverse(
             'posts:profile_unfollow',
-            kwargs={'username': self.user3.username}))
-        authors3 = Follow.objects.filter(user=self.user)
-        cnt3 = len(authors3)
-        self.assertEqual(cnt3, cnt)
+            kwargs={'username': self.user2.username}))
+        authors2 = Follow.objects.filter(user=self.user)
+        cnt2 = len(authors2)
+        self.assertEqual(cnt2, cnt - 1)
 
     def test_follow_posts(self):
         """Проверка наличия поста подписки в ленте"""

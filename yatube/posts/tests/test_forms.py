@@ -76,12 +76,11 @@ class PostFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
-                group='1',
-                # image='posts/small.gif'
-                # не проходит тест, каждый раз название
-                # картинки рандомно генерится, так и не смог победить
+                group='1'
             ).exists()
         )
+        # posts = Post.objects.get(pk=1)
+        # self.assertEqual(posts.image, self.uploaded)
 
     def test_guest_post_create(self):
         """Неавторизованный пользователь не создает запись в Post."""

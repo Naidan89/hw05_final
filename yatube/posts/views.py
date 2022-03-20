@@ -15,8 +15,10 @@ def index(request):
     paginator = Paginator(posts, AMT_SHOW_POSTS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    index = True
     context = {
         'page_obj': page_obj,
+        'index': index
     }
     return render(request, template, context)
 
@@ -55,7 +57,7 @@ def profile(request, username):
 
 
 def post_detail(request, post_id):
-    post = Post.objects.get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     comments = Comment.objects.filter(post_id=post_id)
     form = CommentForm(request.POST or None)
     template = 'posts/post_detail.html'
@@ -80,7 +82,7 @@ def post_create(request):
 
 @login_required
 def post_edit(request, post_id):
-    post = Post.objects.get(pk=post_id)
+    post = get_object_or_404(Post, pk=post_id)
     form = PostForm(
         request.POST or None,
         files=request.FILES or None,
@@ -120,23 +122,20 @@ def follow_index(request):
     paginator = Paginator(posts, AMT_SHOW_POSTS)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+    follow = True
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'follow': follow
     }
     return render(request, 'posts/follow.html', context)
 
 
 @login_required
 def profile_follow(request, username):
-    if request.user.username == username:
-        return redirect('posts:profile', username=username)
     foll_author = get_object_or_404(User, username=username)
-    check_follow = Follow.objects.filter(
-        user=request.user,
-        author=foll_author
-    ).exists()
-    if not check_follow:
-        Follow.objects.create(user=request.user, author=foll_author)
+    if request.user == foll_author:
+        return redirect('posts:profile', username=username)
+    Follow.objects.get_or_create(user=request.user, author=foll_author)
     return redirect('posts:profile', username=username)
 
 
