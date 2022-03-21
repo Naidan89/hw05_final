@@ -57,12 +57,24 @@ class PostFormTests(TestCase):
 
     def test_post_create(self):
         """Валидная форма создает запись в Post."""
-
+        test_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        upload = SimpleUploadedFile(
+            name='test.gif',
+            content=test_gif,
+            content_type='image/gif'
+        )
         tasks_count = Post.objects.count()
         form_data = {
             'text': 'Тестовый текст',
             'group': self.group.id,
-            'image': self.uploaded
+            'image': upload
         }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
@@ -76,11 +88,10 @@ class PostFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
-                group='1'
+                group='1',
+                image='posts/test.gif'
             ).exists()
         )
-        # posts = Post.objects.get(pk=1)
-        # self.assertEqual(posts.image, self.uploaded)
 
     def test_guest_post_create(self):
         """Неавторизованный пользователь не создает запись в Post."""
@@ -99,7 +110,6 @@ class PostFormTests(TestCase):
 
     def test_post_edit(self):
         """Валидная форма редактирует запись в Post."""
-
         post = Post.objects.create(
             author=self.user,
             group=self.group,
